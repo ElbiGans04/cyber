@@ -19,7 +19,7 @@ export default function Home() {
       </Head>
 
       {/* Sebelah Kiri */}
-      <div className="grid p-6 overflow-auto justify-items-center md:col-span-2 ">
+      <div className="p-6 overflow-auto md:col-span-2 ">
         <Search />
         <Category />
         <Cards />
@@ -28,7 +28,7 @@ export default function Home() {
       {/* Sebelah Kanan */}
       <Cart />
 
-      <button className="p-3 bg-slate-900 md:hidden">Cart 🛒</button>
+      <button className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden">Cart 🛒</button>
     </div>
   );
 }
@@ -66,14 +66,14 @@ function Search() {
   };
 
   return (
-    <div className="flex w-full rounded">
+    <div className="flex w-full h-12 rounded">
       <input
         placeholder="Find what you want"
         type="text"
         className="w-full h-full p-2 bg-slate-800 focus:ring-0 focus:border-0 focus:outline-0"
         ref={ref}
       />
-      <button onClick={handler} className="h-12 p-2 bg-slate-900">
+      <button onClick={handler} className="h-full p-2 bg-slate-900">
         🔍
       </button>
     </div>
@@ -86,7 +86,7 @@ function Category() {
     (data) => data.data.filter
   );
   return (
-    <div className="grid w-full h-10 grid-flow-col gap-3 mt-3 overflow-auto md:mt-5 auto-cols-fr">
+    <div className="grid w-full grid-flow-col gap-3 mt-3 overflow-auto h-14 md:mt-5 auto-cols-fr">
       <button
         onClick={() => dispatch(all())}
         className={
