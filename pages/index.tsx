@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Dispatch, SetStateAction, useMemo } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
@@ -21,8 +21,6 @@ import {
 import { TypeDispatch } from "../src/store";
 
 export default function Home() {
-  const dispatch = useDispatch<TypeDispatch>();
-
   return (
     <div className="relative grid w-screen h-screen overflow-hidden text-white bg-gray-700 md:grid-cols-3">
       <Head>
@@ -199,14 +197,47 @@ function Cards() {
 
 function Cart() {
   const dispatch = useDispatch();
-  const data = useSelector<{ cart: TypeCart }, TypeCart["modal"]>(
-    (data) => data.cart.modal
-  );
+  const data = useSelector<{ cart: TypeCart }, TypeCart>((data) => data.cart);
+
+  const [dataTotal, setDataTotal] = useState<
+    { jumlah: number; data: TypeCart["data"][number] }[]
+  >([]);
+
+  useEffect(() => {
+    if (data.data.length > dataTotal.length) {
+      const newDataTotal = [...dataTotal];
+      newDataTotal.push({
+        jumlah: 0,
+        data: data.data[data.data.length - 1],
+      });
+
+      setDataTotal(newDataTotal);
+    } else if (data.data.length < dataTotal.length) {
+      setDataTotal(
+        data.data.map((tunggal) => ({
+          data: tunggal,
+          jumlah:
+            dataTotal.find(
+              (dataTotalSingular) => dataTotalSingular.data.id === tunggal["id"]
+            )?.jumlah || 0,
+        }))
+      );
+    }
+  }, [data.data, dataTotal, setDataTotal]);
+
+  const total = useMemo(() => {
+    return dataTotal.reduce((prev, data) => {
+      const newPrev = {...prev};
+      newPrev.harga = prev.harga + (data.data.price * data.jumlah);
+      newPrev.discount = prev.discount + ((data.data.discount !== 0 ? ((data.data.price * data.data.discount) / 100) : 0) * data.jumlah);
+      return newPrev;
+    }, {harga: 0, discount: 0} as {harga: number, discount: number})
+  }, [dataTotal])
 
   return (
     <div
       className={`absolute duration-500 z-50 flex flex-col w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${
-        data ? "top-0" : "top-[-1000px]"
+        data.modal ? "top-0" : "top-[-1000px]"
       }`}
     >
       <div className="flex items-center justify-between h-16 p-3 p-5 text-center">
@@ -214,15 +245,26 @@ function Cart() {
         <button onClick={() => dispatch(closeModal())}>Close</button>
       </div>
 
-      <CartItems />
+      <div className="flex flex-col w-full h-full p-5 overflow-auto">
+        {dataTotal.map((tunggal) => {
+          return (
+            <CartItem
+              setState={setDataTotal}
+              jumlah={tunggal["jumlah"]}
+              data={tunggal["data"]}
+              key={tunggal["data"]["id"]}
+            />
+          );
+        })}
+      </div>
 
       <div className="grid items-center self-end w-full h-32 grid-cols-2 p-5 justify-items-center bg-slate-800">
         <p>Sub Total</p>
-        <p>Rp. 0</p>
+        <p>{formatRupiah(total.harga, 'Rp.')}</p>
         <p>Discount</p>
-        <p>Rp. 0</p>
+        <p>{formatRupiah(total.discount, 'Rp.')}</p>
         <p>Total</p>
-        <p>Rp. 0</p>
+        <p>{formatRupiah(total.harga - total.discount, 'Rp.')}</p>
       </div>
     </div>
   );
@@ -241,21 +283,109 @@ function CartButton() {
   );
 }
 
-function CartItems() {
-  const data = useSelector<{ cart: TypeCart }, TypeCart["data"]>(
-    (data) => data.cart.data
-  );
-  return (
-    <div className="flex flex-col w-full h-full p-5 overflow-auto">
-      {data.map((tunggal) => {
-        return <CartItem data={tunggal} key={tunggal["id"]} />;
-      })}
-    </div>
-  );
-}
+// function CartItems() {
+//   const data = useSelector<{ cart: TypeCart }, TypeCart["data"]>(
+//     (data) => data.cart.data
+//   );
+//   return (
+//     <div className="flex flex-col w-full h-full p-5 overflow-auto">
+//       {data.map((tunggal) => {
+//         return <CartItem data={tunggal} key={tunggal["id"]} />;
+//       })}
+//     </div>
+//   );
+// }
 
-function CartItem({ data }: { data: TypeCart["data"][number] }) {
+// function CartItem({
+//   data,
+//   jumlah,
+//   setState,
+// }: {
+//   data: TypeCart["data"][number];
+//   jumlah: number;
+//   setState: Dispatch<
+//     SetStateAction<{ data: TypeCart["data"][number]; jumlah: number }[]>
+//   >;
+// }) {
+//   const dispatch = useDispatch();
+
+//   const handler = () => {
+//     // setState(state => {
+//     //   const newState = [...state];
+//     //   const match = newState.findIndex(newStateTunggal => newStateTunggal.data.id === data['id']);
+
+//     //   // Jika tidak ketemu
+//     //   console.log(match, newState[match]['jumlah'])
+//     //   if (match === -1) return state;
+//     //   newState[match]['jumlah'] = newState[match]['jumlah'] + 1;
+//     //   return newState
+//     // })
+//     console.log("Hello")
+//   };
+
+//   return (
+//     <div className="flex flex-col w-full my-5">
+//       <hr></hr>
+//       <br />
+//       <p className="text-xl">{data["name"]}</p>
+//       <p>
+//         <span className="font-bold text-md">
+//           {" "}
+//           {formatRupiah(
+//             data["discount"] !== 0
+//               ? (data["price"] * data["discount"]) / 100
+//               : data["price"],
+//             "Rp."
+//           )}
+//         </span>{" "}
+//         {data["discount"] !== 0 && (
+//           <span className="text-xs text-red-700 line-through">
+//             {formatRupiah(data["price"], "Rp")}
+//           </span>
+//         )}
+//       </p>
+//       <div className="flex items-center justify-between w-full mt-3">
+//         <div>
+//           <button onClick={handler} className="w-10 mr-2 rounded bg-slate-800 lg:p-2">+</button>
+//           <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
+//         </div>
+//         <p>Qty {jumlah}</p>
+//       </div>
+//       <div className="flex items-center w-full mt-3">
+//         <button
+//           onClick={() => dispatch(removeItem({ id: data["id"] }))}
+//           className="w-full p-1 rounded bg-slate-800 lg:p-2"
+//         >
+//           Remove
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+const CartItem = React.memo(function CartItem({
+  data,
+  jumlah,
+  setState,
+}: {
+  data: TypeCart["data"][number];
+  jumlah: number;
+  setState: Dispatch<
+    SetStateAction<{ data: TypeCart["data"][number]; jumlah: number }[]>
+  >;
+}) {
   const dispatch = useDispatch();
+
+  const handler = (tambah: boolean) => {
+    setState(state => {
+      const newState = [...state];
+      const match = newState.findIndex(newStateTunggal => newStateTunggal.data.id === data['id']);
+      if (match === -1) return state;
+      newState[match]['jumlah'] = tambah ? (jumlah + 1) : ((jumlah - 1) < 1 ? 1 : jumlah - 1);
+      return newState
+    })
+  };
+
   return (
     <div className="flex flex-col w-full my-5">
       <hr></hr>
@@ -279,10 +409,10 @@ function CartItem({ data }: { data: TypeCart["data"][number] }) {
       </p>
       <div className="flex items-center justify-between w-full mt-3">
         <div>
-          <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">+</button>
-          <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
+          <button onClick={() => handler(true)} className="w-10 mr-2 rounded bg-slate-800 lg:p-2">+</button>
+          <button onClick={() => handler(false)} className="w-10 rounded bg-slate-800 lg:p-2">-</button>
         </div>
-        <p>Qty 0</p>
+        <p>Qty {jumlah}</p>
       </div>
       <div className="flex items-center w-full mt-3">
         <button
@@ -294,4 +424,4 @@ function CartItem({ data }: { data: TypeCart["data"][number] }) {
       </div>
     </div>
   );
-}
+})
