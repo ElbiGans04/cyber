@@ -210,10 +210,10 @@ function Cart() {
         <p className="text-3xl ">Cart</p>
         <button onClick={() => dispatch(closeModal())}>Close</button>
       </div>
-      <div className="grid w-full h-full gap-5 p-5 overflow-auto">
+      <div className="flex flex-col w-full h-full p-5 overflow-auto">
         {data.data.map((tunggal) => {
           return (
-            <div key={tunggal["id"]} className="flex flex-col w-full">
+            <div key={tunggal["id"]} className="flex flex-col w-full my-5">
               <hr></hr>
               <br />
               <p className="text-xl">{tunggal["name"]}</p>
