@@ -15,10 +15,12 @@ import {
   openModal,
   TypeCart,
   addItem,
+  preparedAddItem
 } from "../src/features/cart/cartReducer";
+import { TypeDispatch } from "../src/store";
 
 export default function Home() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<TypeDispatch>();
 
   return (
     <div className="relative grid w-screen h-screen overflow-hidden text-white bg-gray-700 md:grid-cols-3">
@@ -141,7 +143,7 @@ function Category() {
 }
 
 function Cards() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<TypeDispatch>();
   const data = useSelector<{ data: Type }, Type["result"]>(
     (data) => data.data.result
   );
@@ -153,7 +155,7 @@ function Cards() {
             key={tunggal["id"]}
             className="grid w-full h-full grid-rows-2 overflow-hidden rounded-md shadow cursor-pointer bg-slate-800 shadow-slate-900"
             title={tunggal["name"]}
-            onClick={() => dispatch(addItem(tunggal))}
+            onClick={() => dispatch(preparedAddItem(tunggal))}
           >
             <div className="relative w-full h-full bg-slate-900 ">
               <Image

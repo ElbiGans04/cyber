@@ -1,6 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, Dispatch  } from "@reduxjs/toolkit";
 import { Type } from "../data/dataReducer";
-
+import {TypeDispatch, TypeGetState} from '../../store'
 export interface TypeCart {
   modal: boolean;
   data: Type["result"];
@@ -37,3 +37,13 @@ export const { removeAll, removeItem, addItem, openModal, closeModal } =
   cartReducer.actions;
 
 export default cartReducer.reducer;
+
+
+export function preparedAddItem (data: Type['result'][number]) {
+  return async function (dispatch: TypeDispatch, getState:TypeGetState) {
+    const state = getState();
+    const result = state.cart.data.findIndex(source => source.id === data.id);
+
+    if (result === -1) dispatch(addItem(data))
+  }
+}
