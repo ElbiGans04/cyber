@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
@@ -199,71 +199,30 @@ function Cards() {
 
 function Cart() {
   const dispatch = useDispatch();
-  const data = useSelector<{ cart: TypeCart }, TypeCart>((data) => data.cart);
+  const data = useSelector<{ cart: TypeCart }, TypeCart["modal"]>(
+    (data) => data.cart.modal
+  );
+
   return (
     <div
       className={`absolute duration-500 z-50 flex flex-col w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${
-        data.modal ? "top-0" : "top-[-1000px]"
+        data ? "top-0" : "top-[-1000px]"
       }`}
     >
       <div className="flex items-center justify-between h-16 p-3 p-5 text-center">
         <p className="text-3xl ">Cart</p>
         <button onClick={() => dispatch(closeModal())}>Close</button>
       </div>
-      <div className="flex flex-col w-full h-full p-5 overflow-auto">
-        {data.data.map((tunggal) => {
-          return (
-            <div key={tunggal["id"]} className="flex flex-col w-full my-5">
-              <hr></hr>
-              <br />
-              <p className="text-xl">{tunggal["name"]}</p>
-              <p>
-                <span className="font-bold text-md">
-                  {" "}
-                  {formatRupiah(
-                    tunggal["discount"] !== 0
-                      ? (tunggal["price"] * tunggal["discount"]) / 100
-                      : tunggal["price"],
-                    "Rp."
-                  )}
-                </span>{" "}
-                {tunggal["discount"] !== 0 && (
-                  <span className="text-xs text-red-700 line-through">
-                    {formatRupiah(tunggal["price"], "Rp")}
-                  </span>
-                )}
-              </p>
-              <div className="flex items-center justify-between w-full mt-3">
-                <div>
-                  <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                    +
-                  </button>
-                  <button className="w-10 rounded bg-slate-800 lg:p-2">
-                    -
-                  </button>
-                </div>
-                <p>Qty 0</p>
-              </div>
-              <div className="flex items-center w-full mt-3">
-                <button
-                  onClick={() => dispatch(removeItem({ id: tunggal["id"] }))}
-                  className="w-full p-1 rounded bg-slate-800 lg:p-2"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+
+      <CartItems />
 
       <div className="grid items-center self-end w-full h-32 grid-cols-2 p-5 justify-items-center bg-slate-800">
         <p>Sub Total</p>
-        <p>120.000</p>
+        <p>Rp. 0</p>
         <p>Discount</p>
-        <p>120.000</p>
+        <p>Rp. 0</p>
         <p>Total</p>
-        <p>120.000</p>
+        <p>Rp. 0</p>
       </div>
     </div>
   );
@@ -271,13 +230,68 @@ function Cart() {
 
 function CartButton() {
   const dispatch = useDispatch();
-  const count = useSelector(selectorCountCartItem)
+  const count = useSelector(selectorCountCartItem);
   return (
     <button
       onClick={() => dispatch(openModal())}
       className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden"
     >
-       🛒 Cart ({count})
+      🛒 Cart ({count})
     </button>
+  );
+}
+
+function CartItems() {
+  const data = useSelector<{ cart: TypeCart }, TypeCart["data"]>(
+    (data) => data.cart.data
+  );
+  return (
+    <div className="flex flex-col w-full h-full p-5 overflow-auto">
+      {data.map((tunggal) => {
+        return <CartItem data={tunggal} key={tunggal["id"]} />;
+      })}
+    </div>
+  );
+}
+
+function CartItem({ data }: { data: TypeCart["data"][number] }) {
+  const dispatch = useDispatch();
+  return (
+    <div className="flex flex-col w-full my-5">
+      <hr></hr>
+      <br />
+      <p className="text-xl">{data["name"]}</p>
+      <p>
+        <span className="font-bold text-md">
+          {" "}
+          {formatRupiah(
+            data["discount"] !== 0
+              ? (data["price"] * data["discount"]) / 100
+              : data["price"],
+            "Rp."
+          )}
+        </span>{" "}
+        {data["discount"] !== 0 && (
+          <span className="text-xs text-red-700 line-through">
+            {formatRupiah(data["price"], "Rp")}
+          </span>
+        )}
+      </p>
+      <div className="flex items-center justify-between w-full mt-3">
+        <div>
+          <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">+</button>
+          <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
+        </div>
+        <p>Qty 0</p>
+      </div>
+      <div className="flex items-center w-full mt-3">
+        <button
+          onClick={() => dispatch(removeItem({ id: data["id"] }))}
+          className="w-full p-1 rounded bg-slate-800 lg:p-2"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
   );
 }
