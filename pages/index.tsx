@@ -10,11 +10,16 @@ import {
   discount,
   search,
 } from "../src/features/data/dataReducer";
-import {closeModal, openModal, TypeCart} from '../src/features/cart/cartReducer'
+import {
+  closeModal,
+  openModal,
+  TypeCart,
+  addItem,
+} from "../src/features/cart/cartReducer";
 
 export default function Home() {
   const dispatch = useDispatch();
-  
+
   return (
     <div className="relative grid w-screen h-screen overflow-hidden text-white bg-gray-700 md:grid-cols-3">
       <Head>
@@ -31,7 +36,12 @@ export default function Home() {
       {/* Sebelah Kanan */}
       <Cart />
 
-      <button onClick={() => dispatch(openModal())} className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden">Cart 🛒</button>
+      <button
+        onClick={() => dispatch(openModal())}
+        className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden"
+      >
+        Cart 🛒
+      </button>
     </div>
   );
 }
@@ -131,6 +141,7 @@ function Category() {
 }
 
 function Cards() {
+  const dispatch = useDispatch();
   const data = useSelector<{ data: Type }, Type["result"]>(
     (data) => data.data.result
   );
@@ -142,6 +153,7 @@ function Cards() {
             key={tunggal["id"]}
             className="grid w-full h-full grid-rows-2 overflow-hidden rounded-md shadow cursor-pointer bg-slate-800 shadow-slate-900"
             title={tunggal["name"]}
+            onClick={() => dispatch(addItem(tunggal))}
           >
             <div className="relative w-full h-full bg-slate-900 ">
               <Image
@@ -189,100 +201,53 @@ function Cards() {
 
 function Cart() {
   const dispatch = useDispatch();
-  const data = useSelector<{ cart: TypeCart }, TypeCart>(
-    (data) => data.cart
-  );
+  const data = useSelector<{ cart: TypeCart }, TypeCart>((data) => data.cart);
   return (
-    <div className={`absolute duration-500 z-50 grid w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${data.modal ? "top-0" : "top-[-1000px]"}`}>
+    <div
+      className={`absolute duration-500 z-50 grid w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${
+        data.modal ? "top-0" : "top-[-1000px]"
+      }`}
+    >
       <div className="flex items-center justify-between h-16 p-3 p-5 text-center">
         <p className="text-3xl ">Cart</p>
         <button onClick={() => dispatch(closeModal())}>Close</button>
       </div>
       <div className="grid w-full h-full gap-5 p-5 overflow-auto">
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
+        {data.data.map((tunggal) => {
+          return (
+            <div key={tunggal["id"]} className="flex flex-col w-full">
+              <hr></hr>
+              <p className="text-xl">{tunggal["name"]}</p>
+              <p>
+                <span className="font-bold text-md">
+                  {" "}
+                  {formatRupiah(
+                    tunggal["discount"] !== 0
+                      ? (tunggal["price"] * tunggal["discount"]) / 100
+                      : tunggal["price"],
+                    "Rp."
+                  )}
+                </span>{" "}
+                {tunggal["discount"] !== 0 && (
+                  <span className="text-xs text-red-700 line-through">
+                    {formatRupiah(tunggal["price"], "Rp")}
+                  </span>
+                )}
+              </p>
+              <div className="flex items-center justify-between w-full mt-3">
+                <div>
+                  <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
+                    +
+                  </button>
+                  <button className="w-10 rounded bg-slate-800 lg:p-2">
+                    -
+                  </button>
+                </div>
+                <p>Qty 0</p>
+              </div>
             </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
-            </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
-            </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
-            </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
-            </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
-        <div className="flex flex-col w-full">
-          <hr></hr>
-          <p className="text-xl">Ayam Geprek</p>
-          <p className="font-bold text-md">Rp. 300.000</p>
-          <div className="flex items-center justify-between w-full mt-3">
-            <div>
-              <button className="w-10 mr-2 rounded bg-slate-800 lg:p-2">
-                +
-              </button>
-              <button className="w-10 rounded bg-slate-800 lg:p-2">-</button>
-            </div>
-            <p>Qty 0</p>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       <div className="grid items-center self-end h-32 grid-cols-2 p-5 justify-items-center bg-slate-800">
