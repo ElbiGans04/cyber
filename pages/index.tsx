@@ -10,8 +10,11 @@ import {
   discount,
   search,
 } from "../src/features/data/dataReducer";
+import {closeModal, openModal, TypeCart} from '../src/features/cart/cartReducer'
 
 export default function Home() {
+  const dispatch = useDispatch();
+  
   return (
     <div className="relative grid w-screen h-screen overflow-hidden text-white bg-gray-700 md:grid-cols-3">
       <Head>
@@ -28,7 +31,7 @@ export default function Home() {
       {/* Sebelah Kanan */}
       <Cart />
 
-      <button className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden">Cart 🛒</button>
+      <button onClick={() => dispatch(openModal())} className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden">Cart 🛒</button>
     </div>
   );
 }
@@ -185,11 +188,15 @@ function Cards() {
 }
 
 function Cart() {
+  const dispatch = useDispatch();
+  const data = useSelector<{ cart: TypeCart }, TypeCart>(
+    (data) => data.cart
+  );
   return (
-    <div className="absolute z-50 grid w-full h-full overflow-hidden transition bg-slate-900 md:z-auto md:top-0 md:relative top-[-1000px]">
-      <div className="flex justify-between h-16 p-3 p-5 text-center">
+    <div className={`absolute duration-500 z-50 grid w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${data.modal ? "top-0" : "top-[-1000px]"}`}>
+      <div className="flex items-center justify-between h-16 p-3 p-5 text-center">
         <p className="text-3xl ">Cart</p>
-        <button>Close</button>
+        <button onClick={() => dispatch(closeModal())}>Close</button>
       </div>
       <div className="grid w-full h-full gap-5 p-5 overflow-auto">
         <div className="flex flex-col w-full">
