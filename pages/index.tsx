@@ -19,7 +19,7 @@ export default function Home() {
       </Head>
 
       {/* Sebelah Kiri */}
-      <div className="p-6 overflow-auto md:col-span-2 ">
+      <div className="p-6 overflow-auto md:col-span-2">
         <Search />
         <Category />
         <Cards />
@@ -132,7 +132,7 @@ function Cards() {
     (data) => data.data.result
   );
   return (
-    <div className="grid w-full gap-5 mt-5 md:mt-10 grid-col-1 justify-items-center md:grid-cols-2 ">
+    <div className="grid w-full gap-5 mt-5 mb-16 md:mt-10 grid-col-1 justify-items-center md:grid-cols-2 ">
       {data.map((tunggal) => {
         return (
           <div
