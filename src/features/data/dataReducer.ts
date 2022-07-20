@@ -69,7 +69,7 @@ const dataSlice = createSlice({
         state.result = initialState.result.filter(data => data.discount !== 0);
     },
     search (state, payload: {payload: {name: string}, type: string}) {
-        state.result = state.result.filter(data => data.name.indexOf(payload.payload.name) !== -1);
+        state.result = state.result.filter(data => data.name.toLowerCase().indexOf(payload.payload.name.toLowerCase()) !== -1);
     }
   }
 })
