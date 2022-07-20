@@ -1,36 +1,24 @@
+import {useRef} from 'react'
 import Head from "next/head";
 import Image from "next/image";
-
-const data = [
-  {
-    name: "Nasi Goreng",
-    description:
-      "Nasi Goreng Kambing Kebon Sirih telah melegenda karena berdiri sejak tahun 1958. Seiring berjalan waktu, nasi goreng kambing ini terkenal dan menjadi tujuan kuliner di daerah Kebon Sirih saat malam hari. Menggunakan berbagai bumbu serta potongan daging kambing sehingga menciptakan aroma rempah sangat terasa. Tambahkan emping serta acar agar terasa segar. Langsung pesan melalui GO-FOOD Jakarta!",
-    category: "Food",
-    discount: 0,
-    price: 20000,
-    image: "nasiGoreng.jpg",
-  },
-  {
-    name: "Gurame & Nasi Timbel Putri Ayu - Petojo Selatan",
-    description: "Gurame & Nasi Timbel Dijamin Enaknya",
-    category: "Food",
-    discount: 50,
-    price: 100000,
-    image: "ikanBakar.jpg",
-  },
-  {
-    name: "Jolly Joy",
-    description:
-      "Jolly Joy ini menarik banget ya kemasannya. Di kemas dalam botol kaca dan menarik untuk di foto di social media Go-Foodies. Ada green tea caramel, chocolate hazelnut, vanila crunchy dan masih banyak lagi. Penasaran langsung aja pesan, khusus untuk area GO-FOOD Makassar ya.",
-    category: "Drink",
-    discount: 0,
-    price: 25000,
-    image: "jolly.png",
-  },
-];
+import {useSelector, useDispatch} from 'react-redux'
+import { Type, all, food, drink, discount, search } from "../src/features/data/dataReducer";
 
 export default function Home() {
+  const data = useSelector<{data: Type}, Type>(data => data.data);
+  const dispatch = useDispatch();
+  const ref = useRef<HTMLInputElement>(null)
+
+  /* 
+    Handler
+  */
+  const handler = () => {
+    if(!ref.current) return;
+    const value = ref.current.value;
+    
+    dispatch(value.length === 0 ? all() : search({name: value}))
+  }
+
   return (
     <div className="relative grid w-screen h-screen overflow-hidden text-white bg-gray-700 md:grid-cols-3">
       <Head>
@@ -43,33 +31,32 @@ export default function Home() {
           <input
             placeholder="Find what you want"
             type="text"
-            className="w-full p-2 bg-slate-800 focus:ring-0 focus:border-0 focus:outline-0"
-            name=""
-            id=""
+            className="w-full h-full p-2 bg-slate-800 focus:ring-0 focus:border-0 focus:outline-0"
+            ref={ref}
           />
-          <button className="p-2 bg-slate-900">🔍</button>
+          <button onClick={handler} className="h-12 p-2 bg-slate-900">🔍</button>
         </div>
 
         <div className="grid w-full h-10 grid-flow-col gap-3 mt-3 overflow-auto md:mt-5 auto-cols-fr">
-          <button className="p-1 font-bold underline bg-transparent underline-offset-4 hover:underline">
+          <button onClick={() => dispatch(all())} className={`p-1 bg-transparent underline-offset-4 hover:underline` + (data.filter === "ALL" ? ` font-bold underline` : ``) }>
             All
           </button>
-          <button className="p-1 bg-transparent underline-offset-4 hover:underline ">
+          <button onClick={() => dispatch(food())} className={`p-1 bg-transparent underline-offset-4 hover:underline` + (data.filter === "FOOD" ? ` font-bold underline` : ``) }>
             Food
           </button>
-          <button className="p-1 bg-transparent underline-offset-4 hover:underline ">
+          <button onClick={() => dispatch(drink())} className={`p-1 bg-transparent underline-offset-4 hover:underline` + (data.filter === "DRINK" ? ` font-bold underline` : ``) }>
             Drink
           </button>
-          <button className="p-1 bg-transparent underline-offset-4 hover:underline ">
+          <button onClick={() => dispatch(discount())} className={`p-1 bg-transparent underline-offset-4 hover:underline` + (data.filter === "DISCOUNT" ? ` font-bold underline` : ``) }>
             Discount
           </button>
         </div>
 
         <div className="grid w-full gap-5 mt-5 md:mt-10 grid-col-1 justify-items-center md:grid-cols-2 ">
-          {data.map((tunggal, index) => {
+          {data.result.map((tunggal, index) => {
             return (
               <div
-                key={index}
+                key={tunggal['id']}
                 className="grid w-full h-full grid-rows-2 overflow-hidden rounded-md shadow cursor-pointer bg-slate-800 shadow-slate-900"
                 title={tunggal["name"]}
               >
