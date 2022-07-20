@@ -1,4 +1,4 @@
-import { createSlice, Dispatch  } from "@reduxjs/toolkit";
+import { createSlice, createSelector  } from "@reduxjs/toolkit";
 import { Type } from "../data/dataReducer";
 import {TypeDispatch, TypeGetState} from '../../store'
 export interface TypeCart {
@@ -47,3 +47,9 @@ export function preparedAddItem (data: Type['result'][number]) {
     if (result === -1) dispatch(addItem(data))
   }
 }
+
+const selectorr = (state: ReturnType<TypeGetState>) => state.cart.data
+export const selectorCountCartItem = createSelector(
+  selectorr,
+  data => data.length
+)

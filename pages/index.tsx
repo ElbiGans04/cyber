@@ -16,6 +16,7 @@ import {
   TypeCart,
   removeItem,
   preparedAddItem,
+  selectorCountCartItem,
 } from "../src/features/cart/cartReducer";
 import { TypeDispatch } from "../src/store";
 
@@ -38,12 +39,7 @@ export default function Home() {
       {/* Sebelah Kanan */}
       <Cart />
 
-      <button
-        onClick={() => dispatch(openModal())}
-        className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden"
-      >
-        Cart (199) 🛒
-      </button>
+      <CartButton />
     </div>
   );
 }
@@ -270,5 +266,18 @@ function Cart() {
         <p>120.000</p>
       </div>
     </div>
+  );
+}
+
+function CartButton() {
+  const dispatch = useDispatch();
+  const count = useSelector(selectorCountCartItem)
+  return (
+    <button
+      onClick={() => dispatch(openModal())}
+      className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden"
+    >
+       🛒 Cart ({count})
+    </button>
   );
 }
