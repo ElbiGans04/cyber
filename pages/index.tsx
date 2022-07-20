@@ -14,8 +14,8 @@ import {
   closeModal,
   openModal,
   TypeCart,
-  addItem,
-  preparedAddItem
+  removeItem,
+  preparedAddItem,
 } from "../src/features/cart/cartReducer";
 import { TypeDispatch } from "../src/store";
 
@@ -42,7 +42,7 @@ export default function Home() {
         onClick={() => dispatch(openModal())}
         className="absolute h-12 p-3 border-2 border-slate-600 bottom-5 rounded-xl left-5 bg-slate-900 md:hidden"
       >
-        Cart 🛒
+        Cart (199) 🛒
       </button>
     </div>
   );
@@ -247,6 +247,14 @@ function Cart() {
                   </button>
                 </div>
                 <p>Qty 0</p>
+              </div>
+              <div className="flex items-center w-full mt-3">
+                <button
+                  onClick={() => dispatch(removeItem({ id: tunggal["id"] }))}
+                  className="w-full p-1 rounded bg-slate-800 lg:p-2"
+                >
+                  Remove
+                </button>
               </div>
             </div>
           );
