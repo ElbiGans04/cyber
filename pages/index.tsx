@@ -206,7 +206,7 @@ function Cart() {
   const data = useSelector<{ cart: TypeCart }, TypeCart>((data) => data.cart);
   return (
     <div
-      className={`absolute duration-500 z-50 grid w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${
+      className={`absolute duration-500 z-50 flex flex-col w-full h-full overflow-hidden transition-all bg-slate-900 md:z-auto md:top-0 md:relative ${
         data.modal ? "top-0" : "top-[-1000px]"
       }`}
     >
@@ -219,6 +219,7 @@ function Cart() {
           return (
             <div key={tunggal["id"]} className="flex flex-col w-full">
               <hr></hr>
+              <br />
               <p className="text-xl">{tunggal["name"]}</p>
               <p>
                 <span className="font-bold text-md">
@@ -252,7 +253,7 @@ function Cart() {
         })}
       </div>
 
-      <div className="grid items-center self-end h-32 grid-cols-2 p-5 justify-items-center bg-slate-800">
+      <div className="grid items-center self-end w-full h-32 grid-cols-2 p-5 justify-items-center bg-slate-800">
         <p>Sub Total</p>
         <p>120.000</p>
         <p>Discount</p>
